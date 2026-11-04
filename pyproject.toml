@@ -128,7 +128,7 @@ poetry-plugin-export = ">=1.8"
 
 # To be activated after transfer to new repository
 
-# [tool.sonar]
-# projectKey = "com.exasol:text-ai-extension"
-# host.url = "https://sonarcloud.io"
-# organization = "exasol"
+[tool.sonar]
+projectKey = "com.exasol:text-ai-extension"
+host.url = "https://sonarcloud.io"
+organization = "exasol"

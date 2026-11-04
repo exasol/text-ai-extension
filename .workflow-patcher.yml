@@ -105,14 +105,6 @@ workflows:
           - name: Free Disk Space
             id: free-disk-space
             uses: $/.github/actions/free-diskspace
-      - action: REPLACE
-        job: report
-        step_id: upload-to-sonar
-        content:
-          - name: Sonar is NOT activated for the project
-            id: sonar-not-active
-            run: |
-              echo "Check out https://exasol.github.io/python-toolbox/main/user_guide/features/metrics/sonar.html for more details"
   - name: dependency-update
     step_customizations:
       - action: INSERT_AFTER
