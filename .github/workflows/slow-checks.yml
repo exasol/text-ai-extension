@@ -1,0 +1,53 @@
+name: Run Slow Tests
+
+on:
+  workflow_call:
+
+jobs:
+  build-matrix:
+    name: Build Matrix
+    uses: $/.github/workflows/matrix.yml
+    with:
+      matrix_keys_json: '["minimum_python_version"]'
+    permissions:
+      contents: read
+
+  run-integration-tests:
+    runs-on:
+      labels: int-linux-x64-4core-ubuntu26.04-1
+    needs:
+     - build-matrix
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
+    steps:
+      - name: SCM Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Free Disk Space
+        uses: $/.github/actions/free-diskspace
+
+      - name: Fix VM Crash in UDFs
+        id: fix-vm-crash
+        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+
+      - name: Setup Python & Poetry Environment
+        uses: exasol/python-toolbox/.github/actions/python-environment@v12
+        with:
+          python-version: ${{ matrix.minimum_python_version }}
+          poetry-version: "2.3.0"
+
+      - name: Run Integration Tests
+        id: run-integration-tests
+        run: poetry run -- nox -s test:integration -- --coverage
+
+      - name: Upload Artifacts
+        id: upload-artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-python${{ matrix.python_versions }}-slow
+          path: .coverage
+          include-hidden-files: true
+          overwrite: false

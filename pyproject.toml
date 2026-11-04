@@ -1,0 +1,134 @@
+[build-system]
+requires = [
+    "poetry>=2.3.0",
+]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+packages = [
+    { include = "exasol" }
+]
+
+[project]
+name = "exasol-text-ai-extension"
+version = "0.4.2"
+description = "Software components for text-based AI applications, such as information extraction."
+authors = [{ name = "Christoph Kuhnke", email = "christoph.kuhnke@exasol.com" }]
+maintainers = [
+  { name = "Christoph Kuhnke", email = "christoph.kuhnke@exasol.com" },
+  { name = "Michael Beck", email = "michael.beck@exasol.com" }
+]
+requires-python = ">=3.11,<3.14"
+readme = "README.md"
+license = "MIT"
+keywords = [
+    "exasol",
+    "text_ai_extension",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "numpy ==1.*",
+    "keybert ==0.8.*",
+    "spacy <=3.8.6", # v3.8.7 caused ModuleNotFoundError: No module named 'spacy.pipeline.factories'
+    "exasol-python-extension-common >=0.9.0,<1",
+    "pydantic ==2.*",
+    "exasol-advanced-analytics-framework >=0.4.1,<1",
+    "exasol-transformers-extension ==5.*",
+    "transformers >= 4.48.0",
+    "exasol-keyphrase-vectorizers (>=1.0.0,<2.0.0)",
+]
+
+[project.urls]
+Homepage = "https://github.com/exasol/text-ai-extension"
+Repository = "https://github.com/exasol/text-ai-extension"
+Documentation = "https://github.com/exasol/text-ai-extension"
+Source = "https://github.com/exasol/text-ai-extension"
+Issues = "https://github.com/exasol/text-ai-extension/issues"
+
+[project.entry-points]
+
+[dependency-groups]
+dev = [
+    "exasol-toolbox>=12.0.0,<13",
+    "exasol-udf-mock-python>=0.3.0,<1",
+    "pytest-exasol-backend>=1.4.1,<2",
+    "pytest-exasol-slc >=1.0.1,<2",
+    "pytest-exasol-extension>=1.0.1,<2",
+    "virtualenv<22",
+    "toml>=0.10.2,<0.11",
+    "boto3>=1.37.19,<2.0.0",
+]
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+python_files = [
+    "utest_*.py",
+    "itest_*.py",
+    "test_*.py",
+]
+
+[tool.coverage.run]
+source = [
+    "exasol",
+]
+
+[tool.coverage.report]
+fail_under = 15
+
+
+[tool.black]
+line-length = 88
+verbose = false
+include = "\\.pyi?$"
+
+
+[tool.isort]
+profile = "black"
+force_grid_wrap = 2
+
+
+[tool.pylint.master]
+fail-under = 7.5
+output-format = "colorized,json:.lint.json,text:.lint.txt"
+ignore-paths = [
+    ".*/test/.*",
+]
+
+[tool.pylint.format]
+max-line-length = 88
+max-module-lines = 800
+
+[tool.mypy]
+ignore_missing_imports = true
+plugins = ['pydantic.mypy']
+
+[[tool.mypy.overrides]]
+module = [
+    "test.*",
+]
+ignore_errors = true
+
+[tool.ruff.lint]
+extend-ignore = [
+    "E", # Syntax errors
+    "F", # Pyflakes rules (excluding F401)
+    "UP", # pyupgrade rules
+    "D", # Docstring rules
+]
+extend-select = ["F401"]
+unfixable = []
+
+[tool.poetry.requires-plugins]
+poetry-plugin-export = ">=1.8"
+
+# To be activated after transfer to new repository
+
+# [tool.sonar]
+# projectKey = "com.exasol:text-ai-extension"
+# host.url = "https://sonarcloud.io"
+# organization = "exasol"

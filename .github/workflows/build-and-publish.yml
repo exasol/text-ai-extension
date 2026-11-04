@@ -1,0 +1,57 @@
+# Generated and maintained by the exasol-toolbox.
+name: Build & Publish
+
+on:
+  workflow_call:
+    secrets:
+      PYPI_TOKEN:
+        required: true
+
+jobs:
+  build-and-publish:
+    name: Build & Publish
+    runs-on: "ubuntu-26.04"
+    permissions:
+      contents: write
+    steps:
+      - name: Check out Repository
+        id: check-out-repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Python & Poetry Environment
+        id: set-up-python-and-poetry-environment
+        uses: exasol/python-toolbox/.github/actions/python-environment@v12
+        with:
+          python-version: "3.11"
+          poetry-version: "2.3.0"
+
+      - name: Build Artifacts
+        id: build-artifacts
+        run: poetry build
+
+      - name: Generate SBOM
+        id: generate-sbom
+        run: |
+          SBOM_NAME="$(poetry run -- nox -s dependency:sbom)"
+          echo "SBOM_NAME=$SBOM_NAME" >> "$GITHUB_OUTPUT"
+
+      - name: Publish Release to PyPi
+        id: publish-release-to-pypi
+        env:
+          POETRY_HTTP_BASIC_PYPI_USERNAME: "__token__"
+          POETRY_HTTP_BASIC_PYPI_PASSWORD: "${{ secrets.PYPI_TOKEN }}"
+        run: poetry publish # zizmor: ignore[use-trusted-publishing] - Trusted Publishing is not usable from this reusable workflow yet; see https://github.com/exasol/python-toolbox/issues/871
+
+      - name: Publish Release to GitHub
+        id: publish-release-to-github
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SBOM_NAME: ${{ steps.generate-sbom.outputs.SBOM_NAME }}
+        run: >-
+          gh release create ${GITHUB_REF_NAME}
+          --title ${GITHUB_REF_NAME}
+          --notes-file ./doc/changes/changes_${GITHUB_REF_NAME}.md
+          dist/*
+          "$SBOM_NAME"

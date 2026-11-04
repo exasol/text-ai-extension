@@ -1,0 +1,41 @@
+name: Upload Script Language Container (SLC)
+
+on:
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  upload-job:
+    runs-on:
+      labels: int-linux-x64-4core-ubuntu26.04-1
+    environment: pre-release
+    steps:
+      - name: SCM Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Free Disk Space
+        uses: $/.github/actions/free-diskspace
+
+      - name: Setup Python & Poetry Environment
+        uses: exasol/python-toolbox/.github/actions/python-environment@v12
+        with:
+          python-version: "3.11"
+          poetry-version: "2.3.0"
+
+      - uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE }}
+          role-session-name: github-actions-zip
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Build and Upload the Project Zip
+        run: poetry run -- nox -s slc:s3-upload
+        env:
+          AWS_S3_BUCKET: ${{ vars.AWS_S3_BUCKET }}
+          AWS_DISTRIBUTION_ID: ${{ vars.AWS_DISTRIBUTION_ID }}
