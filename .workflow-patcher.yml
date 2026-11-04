@@ -1,0 +1,124 @@
+workflows:
+  - name: fast-tests
+    step_customizations:
+      - action: INSERT_AFTER
+        job: run-unit-tests
+        step_id: check-out-repository
+        content:
+          - name: Free Disk Space
+            id: free-disk-space
+            uses: $/.github/actions/free-diskspace
+
+      - action: REPLACE
+        job: run-unit-tests
+        step_id: run-unit-tests
+        content:
+          - name: Run Unit Tests
+            id: run-unit-tests
+            run: poetry run -- nox -s test:unit -- test/integration/no_db --coverage
+
+  - name: checks
+    step_customizations:
+      - action: INSERT_AFTER
+        job: build-documentation-and-check-links
+        step_id: check-out-repository
+        content:
+          - name: Free Disk Space
+            id: free-disk-space
+            uses: $/.github/actions/free-diskspace
+      - action: INSERT_AFTER
+        job: check-changelog-was-updated
+        step_id: check-out-repository
+        content:
+          - name: Free Disk Space
+            id: free-disk-space
+            uses: $/.github/actions/free-diskspace
+      - action: INSERT_AFTER
+        job: lint-code
+        step_id: check-out-repository
+        content:
+          - name: Free Disk Space
+            id: free-disk-space
+            uses: $/.github/actions/free-diskspace
+      - action: INSERT_AFTER
+        job: lint-typing
+        step_id: check-out-repository
+        content:
+          - name: Free Disk Space
+            id: free-disk-space
+            uses: $/.github/actions/free-diskspace
+      - action: INSERT_AFTER
+        job: check-format
+        step_id: check-out-repository
+        content:
+          - name: Free Disk Space
+            id: free-disk-space
+            uses: $/.github/actions/free-diskspace
+      - action: INSERT_AFTER
+        job: check-workflows
+        step_id: check-out-repository
+        content:
+          - name: Free Disk Space
+            id: free-disk-space
+            uses: $/.github/actions/free-diskspace
+      - action: INSERT_AFTER
+        job: audit-workflows
+        step_id: check-out-repository
+        content:
+          - name: Free Disk Space
+            id: free-disk-space
+            uses: $/.github/actions/free-diskspace
+      - action: INSERT_AFTER
+        job: audit-security
+        step_id: check-out-repository
+        content:
+          - name: Free Disk Space
+            id: free-disk-space
+            uses: $/.github/actions/free-diskspace
+  - name: check-release-tag
+    step_customizations:
+      - action: INSERT_AFTER
+        job: check-release-tag
+        step_id: check-out-repository
+        content:
+          - name: Free Disk Space
+            id: free-disk-space
+            uses: $/.github/actions/free-diskspace
+  - name: gh-pages
+    remove_jobs:
+      # Documentation is currently not deployed to GitHub
+      - deploy-documentation
+    step_customizations:
+      - action: INSERT_AFTER
+        job: build-documentation
+        step_id: check-out-repository
+        content:
+          - name: Free Disk Space
+            id: free-disk-space
+            uses: $/.github/actions/free-diskspace
+  - name: report
+    step_customizations:
+      - action: INSERT_AFTER
+        job: report
+        step_id: check-out-repository
+        content:
+          - name: Free Disk Space
+            id: free-disk-space
+            uses: $/.github/actions/free-diskspace
+      - action: REPLACE
+        job: report
+        step_id: upload-to-sonar
+        content:
+          - name: Sonar is NOT activated for the project
+            id: sonar-not-active
+            run: |
+              echo "Check out https://exasol.github.io/python-toolbox/main/user_guide/features/metrics/sonar.html for more details"
+  - name: dependency-update
+    step_customizations:
+      - action: INSERT_AFTER
+        job: dependency-update
+        step_id: check-out-repository
+        content:
+          - name: Free Disk Space
+            id: free-disk-space
+            uses: $/.github/actions/free-diskspace

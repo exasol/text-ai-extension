@@ -1,0 +1,47 @@
+# Generated and maintained by the exasol-toolbox.
+name: CD
+
+on:
+  push:
+    tags:
+      - '**'
+      - '!v*'
+      - '!latest'
+
+jobs:
+  check-release-tag:
+    name: Check Release Tag
+    uses: $/.github/workflows/check-release-tag.yml
+    permissions:
+      contents: read
+
+  build-and-publish:
+    needs:
+      - check-release-tag
+    name: Build & Publish
+    uses: $/.github/workflows/build-and-publish.yml
+    permissions:
+      contents: write
+    secrets:
+      PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
+
+  cd-extension:
+    name: Extension
+    uses: $/.github/workflows/cd-extension.yml
+    needs:
+      - check-release-tag
+      - build-and-publish
+    permissions:
+      contents: read
+      id-token: write
+
+
+  publish-docs:
+    needs:
+      - build-and-publish
+    name: Publish Documentation
+    uses: $/.github/workflows/gh-pages.yml
+    permissions:
+      contents: read
+      pages: write
+      id-token: write

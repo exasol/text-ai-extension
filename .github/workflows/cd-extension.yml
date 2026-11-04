@@ -1,0 +1,12 @@
+name: CD-Extension
+
+on:
+  workflow_call:
+
+jobs:
+  upload-slc:
+    name: Upload SLC to AWS S3 bucket
+    uses: $/.github/workflows/upload_slc.yml
+    permissions:
+      contents: read
+      id-token: write
