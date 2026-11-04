@@ -11,7 +11,7 @@ packages = [
 
 [project]
 name = "exasol-text-ai-extension"
-version = "0.4.2"
+version = "1.0.0"
 description = "Software components for text-based AI applications, such as information extraction."
 authors = [{ name = "Christoph Kuhnke", email = "christoph.kuhnke@exasol.com" }]
 maintainers = [
