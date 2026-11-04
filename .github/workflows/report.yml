@@ -45,7 +45,8 @@ jobs:
         id: validate-artifacts
         run: poetry run -- nox -s artifacts:validate
 
-      - name: Sonar is NOT activated for the project
-        id: sonar-not-active
-        run: |
-          echo "Check out https://exasol.github.io/python-toolbox/main/user_guide/features/metrics/sonar.html for more details"
+      - name: Upload to Sonar
+        id: upload-to-sonar
+        env:
+          SONAR_TOKEN: "${{ secrets.SONAR_TOKEN }}"
+        run: poetry run -- nox -s sonar:check

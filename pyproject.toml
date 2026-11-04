@@ -11,7 +11,7 @@ packages = [
 
 [project]
 name = "exasol-text-ai-extension"
-version = "0.4.2"
+version = "1.0.0"
 description = "Software components for text-based AI applications, such as information extraction."
 authors = [{ name = "Christoph Kuhnke", email = "christoph.kuhnke@exasol.com" }]
 maintainers = [
@@ -126,9 +126,8 @@ unfixable = []
 [tool.poetry.requires-plugins]
 poetry-plugin-export = ">=1.8"
 
-# To be activated after transfer to new repository
 
-# [tool.sonar]
-# projectKey = "com.exasol:text-ai-extension"
-# host.url = "https://sonarcloud.io"
-# organization = "exasol"
+[tool.sonar]
+projectKey = "com.exasol:text-ai-extension"
+host.url = "https://sonarcloud.io"
+organization = "exasol"
